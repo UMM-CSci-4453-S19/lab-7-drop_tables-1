@@ -8,7 +8,33 @@ var mysql=require("mysql");
 credentials.host="ids"
 credentials.database = "create_tables"
 var connection = mysql.createConnection(credentials);
+var Promise = require('bluebird');
+var using = Promise.using;
+Promise.promisifyAll(require("mysql/lib/Connection").prototype);
+Promise.promisifyAll(require("mysql/lib/Pool").prototype);
 var tableinf = [];
+
+var getConnection=function(){
+  return pool.getConnectionAsync().disposer(
+    function(connection){
+      return connection.release();
+    }
+  );
+};
+
+var query = function(command) {
+  return using(getConnection(),function(connection){
+    return connection.queryAsync(command);
+  });
+};
+
+var result = query("select * from till_buttons;");
+
+result.then(function(dbfs,err){
+  console.log(dbfs)
+}).then(function(){
+  pool.end();
+});
 
 connection.connect(function(err) {
   if (err) throw err;
