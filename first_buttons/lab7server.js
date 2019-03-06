@@ -13,6 +13,7 @@ var using = Promise.using;
 Promise.promisifyAll(require("mysql/lib/Connection").prototype);
 Promise.promisifyAll(require("mysql/lib/Pool").prototype);
 var tableinf = [];
+var pool = mysql.createPool(credentials);
 
 var getConnection=function(){
   return pool.getConnectionAsync().disposer(
@@ -29,9 +30,8 @@ var query = function(command) {
 };
 
 var result = query("select * from till_buttons;");
-
 result.then(function(dbfs,err){
-  console.log(dbfs)
+  console.log(dbfs.length)
 }).then(function(){
   pool.end();
 });
